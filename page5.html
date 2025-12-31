@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fireworks Christmas & New Year Greeting</title>
+    <style>
+        html, body { 
+            margin: 0; 
+            height: 100%; 
+            overflow: hidden;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("pictures/7.png") center / cover no-repeat;
+            z-index: -1;
+        }
+
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+            padding: 20px;
+        }
+
+        .greeting-image {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 1.5s ease-out, transform 1.5s ease-out;
+        }
+
+        .greeting-image.show {
+            opacity: 1;
+            transform: scale(1);
+            animation: floating 4s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0%   { transform: scale(1) translateY(0); }
+            50%  { transform: scale(1) translateY(-15px); }
+            100% { transform: scale(1) translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .greeting-image {
+                max-width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fireworksCanvas"></canvas>
+    
+    <div class="container">
+        <img src="pictures/6.png" alt="Merry Christmas and Happy New Year" class="greeting-image" id="greeting">
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('fireworksCanvas');
+            const ctx = canvas.getContext('2d');
+            const greeting = document.getElementById('greeting');
+            
+            const fireworkColors = {
+                firework1: '#FF63E3',
+                firework2: '#7DFF7D',  
+                firework3: '#FCF888',
+                firework4: '#FF63E3',
+                firework5: '#7DFF7D',
+                firework6: '#FCF888',
+                firework7: '#FF63E3',
+                firework8: '#7DFF7D',
+                firework9: '#FCF888',
+                firework10: '#FF63E3',
+                firework11: '#7DFF7D',
+                firework12: '#FCF888',
+                firework13: '#FF63E3',
+                firework14: '#7DFF7D',
+                firework15: '#FCF888'
+            };
+            
+            let fireworkHeight = 0.7;
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            let particles = [];
+            let rockets = [];
+            let fireworkCount = 0;
+            const totalFireworks = 15;
+            let fireworkQueue = [];
+            
+            function initializeFireworkQueue() {
+                fireworkQueue = [];
+                for (let i = 1; i <= totalFireworks; i++) {
+                    const colorKey = `firework${i}`;
+                    fireworkQueue.push({
+                        id: i,
+                        color: fireworkColors[colorKey],
+                        launched: false
+                    });
+                }
+            }
+            
+            class Particle {
+                constructor(x, y, color, angle, speed, size) {
+                    this.x = x;
+                    this.y = y;
+                    this.color = color;
+                    this.size = size;
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed;
+                    this.alpha = 1;
+                    this.decay = 0.015;
+                    this.gravity = 0.05;
+                }
+                
+                update() {
+                    this.vx *= 0.97;
+                    this.vy *= 0.97;
+                    this.vy += this.gravity;
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.alpha -= this.decay;
+                    this.size *= 0.98;
+                    return this.alpha > 0;
+                }
+                
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+            
+            class Rocket {
+                constructor(x, color, id) {
+                    this.x = x;
+                    this.y = canvas.height;
+                    this.color = color;
+                    this.id = id;
+                    this.vy = -9;
+                    this.size = 3;
+                    this.exploded = false;
+                    this.trail = [];
+                    this.targetY = canvas.height * (0.1 + Math.random() * fireworkHeight);
+                }
+                
+                update() {
+                    this.trail.push({x: this.x, y: this.y});
+                    if (this.trail.length > 5) this.trail.shift();
+                    this.y += this.vy;
+                    if (this.y <= this.targetY && !this.exploded) {
+                        this.explode();
+                        return false;
+                    }
+                    return true;
+                }
+                
+                explode() {
+                    this.exploded = true;
+                    fireworkCount++;
+                    const idx = fireworkQueue.findIndex(f => f.id === this.id);
+                    if (idx !== -1) fireworkQueue[idx].launched = true;
+                    for (let i = 0; i < 50; i++) {
+                        particles.push(new Particle(
+                            this.x,
+                            this.y,
+                            this.color,
+                            Math.random() * Math.PI * 2,
+                            Math.random() * 5,
+                            2 + Math.random() * 3
+                        ));
+                    }
+                    if (fireworkCount === totalFireworks) {
+                        setTimeout(() => greeting.classList.add('show'), 800);
+                    }
+                }
+                
+                draw() {
+                    ctx.save();
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+            
+            function launchFireworkTrio() {
+                const unlaunched = fireworkQueue.filter(f => !f.launched);
+                if (unlaunched.length) {
+                    new Array(Math.min(3, unlaunched.length)).fill(0).forEach((_, i) =>
+                        setTimeout(() => rockets.push(new Rocket(
+                            100 + Math.random() * (canvas.width - 200),
+                            unlaunched[i].color,
+                            unlaunched[i].id
+                        )), i * 300)
+                    );
+                }
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles = particles.filter(p => (p.update(), p.draw(), p.alpha > 0));
+                rockets = rockets.filter(r => (r.update(), r.draw(), !r.exploded));
+                requestAnimationFrame(animate);
+            }
+            
+            function init() {
+                greeting.classList.remove('show');
+                initializeFireworkQueue();
+                animate();
+                [800, 2500, 4200, 5900, 7600].forEach(t =>
+                    setTimeout(launchFireworkTrio, t)
+                );
+            }
+            
+            init();
+        });
+    </script>
+</body>
+</html>

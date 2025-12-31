@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Second Page</title>
+<style>
+    html, body { 
+      margin: 0; 
+      height: 100%; 
+      position: relative; 
+      overflow: hidden;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      transition: background 1.5s ease;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url("pictures/4.jpeg") center / cover no-repeat;
+      opacity: 0.7;
+      z-index: -1;
+      transition: opacity 1.5s ease, background-image 1.5s ease;
+    }
+
+  @keyframes pageFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  #container {
+    position: relative;
+    width: 400px;
+    height: 500px;
+    user-select: none;
+    z-index: 10;
+    opacity: 0;
+    transform: scale(0.9);
+    animation: containerFadeIn 0.8s ease-out 0.3s forwards;
+  }
+
+  @keyframes containerFadeIn {
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    top: 0; left: 0;
+    pointer-events: none;
+    opacity: 0;
+    animation: layerFadeIn 0.5s ease-out forwards;
+  }
+
+  @keyframes layerFadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+
+  #snowman { 
+    z-index: 1; 
+    animation-delay: 0.5s;
+    opacity: 1 !important;
+  }
+  #snow5 { z-index: 6; animation-delay: 0.6s; }
+  #snow4 { z-index: 5; animation-delay: 0.7s; }
+  #snow3 { z-index: 4; animation-delay: 0.8s; }
+  #snow2 { z-index: 3; animation-delay: 0.9s; }
+  #snow1 { z-index: 2; animation-delay: 1.0s; }
+
+  #tapBtn {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(145deg, #DB4D4D, #FB6767);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-weight: bold;
+    cursor: pointer;
+    display: none;
+    z-index: 10;
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+    font-size: 16px;
+    line-height: 70px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+  }
+
+  #tapBtn.show {
+    display: block;
+    opacity: 1;
+    transform: scale(1);
+    animation: buttonPulse 1.5s infinite;
+  }
+
+  @keyframes buttonPulse {
+    0%, 100% { box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4); }
+    50% { box-shadow: 0 6px 30px rgba(255, 0, 0, 0.7); }
+  }
+
+  .snowflakes-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    animation: fadeIn 1s ease-out 0.5s forwards;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+
+  .svg-snowflake {
+    position: absolute;
+    animation: fall linear forwards;
+    filter: drop-shadow(0 0 2px white);
+  }
+
+  @keyframes fall {
+    to {
+      transform: translateY(100vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  .removing {
+    opacity: 0 !important;
+    transform: scale(1.1);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  #shovel-animation {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    background-image: url('accesories/minecraft-shovel.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transform-origin: center bottom;
+  }
+
+  @keyframes shovelDig {
+    0% { transform: translate(-50%, -50%) scale(0.5) rotate(-30deg); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.2) rotate(10deg); opacity: 1; }
+    40% { transform: translate(-50%, -50%) scale(1) rotate(-5deg); opacity: 1; }
+    60% { transform: translate(-50%, -50%) scale(0.9) rotate(0deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0) rotate(15deg); opacity: 0; }
+  }
+
+  .snow-particle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    filter: blur(1px);
+  }
+
+  @keyframes snowFly {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.3); }
+  }
+
+  .shake {
+    animation: shake 0.3s;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+</style>
+</head>
+<body>
+  <div class="snowflakes-container" id="snowflakesContainer"></div>
+  
+  <div id="container">
+    <img id="snowman" class="layer" src="accesories/snowman.png" alt="Snowman" />
+    <img id="snow5" class="layer" src="snowlayers/snow5.png" alt="Snow Layer 5" />
+    <img id="snow4" class="layer" src="snowlayers/snow4.png" alt="Snow Layer 4" />
+    <img id="snow3" class="layer" src="snowlayers/snow3.png" alt="Snow Layer 3" />
+    <img id="snow2" class="layer" src="snowlayers/snow2.png" alt="Snow Layer 2" />
+    <img id="snow1" class="layer" src="snowlayers/snow1.png" alt="Snow Layer 1" />
+
+    <button id="tapBtn">TAP</button>
+  </div>
+
+  <div id="shovel-animation"></div>
+
+<script>
+const SNOWFLAKE_COUNT = 100;
+const BUTTON_INTERVAL = 1200;
+const PARTICLE_COUNT = 8;
+
+let buttonTimer;
+let layersRemoved = 0;
+let gameActive = true;
+
+const container = document.getElementById('container');
+const tapBtn = document.getElementById('tapBtn');
+const shovelAnimation = document.getElementById('shovel-animation');
+const snowflakesContainer = document.getElementById('snowflakesContainer');
+
+const snowman = document.getElementById('snowman');
+snowman.style.opacity = '1';
+snowman.style.display = 'block';
+
+const snowLayers = [
+  document.getElementById('snow1'),
+  document.getElementById('snow2'),
+  document.getElementById('snow3'),
+  document.getElementById('snow4'),
+  document.getElementById('snow5'),
+];
+
+function initGame() {
+  snowman.style.opacity = '1';
+  snowman.style.display = 'block';
+  
+  snowLayers.forEach(layer => {
+    layer.style.display = 'block';
+    layer.style.opacity = '1';
+  });
+  
+  layersRemoved = 0;
+  gameActive = true;
+  
+  setTimeout(() => {
+    buttonTimer = setInterval(showTapButton, BUTTON_INTERVAL);
+    setTimeout(showTapButton, 800);
+  }, 1500);
+  
+  createSnowflakes();
+}
+
+function createSnowflakes() {
+  for (let i = 0; i < SNOWFLAKE_COUNT; i++) {
+    setTimeout(createSingleSnowflake, i * 50);
+  }
+}
+
+function createSingleSnowflake() {
+  const svgNS = "http://www.w3.org/2000/svg";
+  const snowflake = document.createElementNS(svgNS, "svg");
+  snowflake.classList.add("svg-snowflake");
+  
+  const size = Math.random() * 20 + 10;
+  snowflake.setAttribute("width", size);
+  snowflake.setAttribute("height", size);
+  snowflake.setAttribute("viewBox", "0 0 24 24");
+  
+  const path = document.createElementNS(svgNS, "path");
+  path.setAttribute("d", "M12 2L13.5 5.5L17.5 4.5L15 8L18 11L14 11.5L15 15.5L12 13.5L9 15.5L10 11.5L6 11L9 8L6.5 4.5L10.5 5.5L12 2");
+  path.setAttribute("fill", "white");
+  path.setAttribute("opacity", Math.random() * 0.6 + 0.3);
+  
+  snowflake.appendChild(path);
+  
+  snowflake.style.left = Math.random() * 100 + 'vw';
+  snowflake.style.top = '-50px';
+  
+  const duration = Math.random() * 8 + 5;
+  snowflake.style.animationDuration = duration + 's';
+  
+  snowflakesContainer.appendChild(snowflake);
+  
+  setTimeout(() => {
+    snowflake.remove();
+    createSingleSnowflake();
+  }, duration * 1000);
+}
+
+function placeButtonRandomly() {
+  const rect = container.getBoundingClientRect();
+  const padding = 40;
+  const minX = padding;
+  const maxX = rect.width - 70 - padding;
+  const minY = rect.height * 0.5;
+  const maxY = rect.height - 70 - padding;
+
+  const randomX = Math.random() * (maxX - minX) + minX;
+  const randomY = Math.random() * (maxY - minY) + minY;
+
+  tapBtn.style.left = `${randomX}px`;
+  tapBtn.style.top = `${randomY}px`;
+}
+
+function showTapButton() {
+  if (!gameActive) return;
+  
+  const anyVisible = snowLayers.some(l => l.style.display !== 'none');
+  if (anyVisible && !tapBtn.classList.contains('show')) {
+    placeButtonRandomly();
+    tapBtn.classList.add('show');
+  }
+}
+
+function hideTapButton() {
+  tapBtn.classList.remove('show');
+}
+
+function createShovelAnimation(x, y) {
+  shovelAnimation.style.left = `${x}px`;
+  shovelAnimation.style.top = `${y}px`;
+  shovelAnimation.style.animation = 'none';
+  void shovelAnimation.offsetWidth;
+  shovelAnimation.style.animation = 'shovelDig 0.7s ease-out forwards';
+  
+  createSnowParticles(x, y);
+}
+
+function createSnowParticles(x, y) {
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'snow-particle';
+    particle.style.left = `${x}px`;
+    particle.style.top = `${y}px`;
+    
+    const angle = (Math.PI * 2 / PARTICLE_COUNT) * i;
+    const distance = 20 + Math.random() * 40;
+    particle.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+    particle.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+    particle.style.animation = `snowFly 0.5s ease-out forwards ${Math.random() * 0.1}s`;
+    
+    document.body.appendChild(particle);
+    setTimeout(() => particle.remove(), 600);
+  }
+}
+
+function shakeSnowman() {
+  snowman.classList.add('shake');
+  setTimeout(() => snowman.classList.remove('shake'), 300);
+}
+
+function removeNextLayer() {
+  for (let i = 0; i < snowLayers.length; i++) {
+    const layer = snowLayers[i];
+    if (layer.style.display !== 'none') {
+      layer.classList.add('removing');
+      
+      setTimeout(() => {
+        layer.style.display = 'none';
+        layer.classList.remove('removing');
+      }, 400);
+      
+      layersRemoved++;
+      return true;
+    }
+  }
+  return false;
+}
+
+function completeGame() {
+  gameActive = false;
+  hideTapButton();
+  clearInterval(buttonTimer);
+  
+  shakeSnowman();
+  
+  setTimeout(() => {
+    document.body.style.transition = "opacity 0.5s ease";
+    document.body.style.opacity = "0";
+    
+    setTimeout(() => {
+      window.location.href = "page3.html";
+    }, 500);
+  }, 1000);
+}
+
+tapBtn.addEventListener('click', () => {
+  if (!gameActive) return;
+  
+  const rect = tapBtn.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+  
+  createShovelAnimation(x, y);
+  shakeSnowman();
+  hideTapButton();
+  
+  removeNextLayer();
+  
+  if (layersRemoved === 5) {
+    completeGame();
+  }
+});
+
+window.addEventListener('load', initGame);
+</script>
+</body>
+</html>

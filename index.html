@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Galindo&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+  <style>
+    html, body { 
+      margin: 0; 
+      height: 100%; 
+      position: relative; 
+      overflow: hidden;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      transition: background 1.5s ease;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url("pictures/2.jpeg") center / cover no-repeat;
+      opacity: 0.7;
+      z-index: -1;
+      transition: opacity 1.5s ease, background-image 1.5s ease;
+    }
+    
+    /* First page styles */
+    .welcome-container {
+      display: flex;
+      flex-direction: column;
+      width: 70%;
+      height: 50%;
+      background-color: #F5F6FF;
+      justify-content: center;
+      align-items: center;
+      border-radius: 30px;
+      border: 3.5px dashed #006BB1;
+      position: relative;
+      z-index: 0;
+      resize: none;
+      min-height: 400px;
+      transition: all 2s cubic-bezier(0.42, 0, 0.58, 1);
+      overflow: hidden;
+    }
+    
+    .welcome-gif {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) translateY(-80px);
+      width: 85%;
+      height: 50%;
+      background-color: #7ABBFF;
+      border-radius: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 2s cubic-bezier(0.42, 0, 0.58, 1);
+      z-index: 1;
+      overflow: hidden;
+      /* BORDER FOR LOGIN ONLY */
+      border: 5px solid #4C97E1;
+    }
+    
+    /* Login GIF */
+    .login-gif {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    
+    /* BMO Animation Image */
+    .bmo-animation-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    
+    /* Welcome Text */
+    .welcome-text {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: "Galindo", "Comic Sans MS", "Comic Sans";
+      font-size: 32px;
+      font-weight: bold;
+      color: #006644;
+      text-align: center;
+      padding: 20px;
+      opacity: 0;
+      z-index: 2;
+    }
+    
+    /* Redirect countdown text */
+    .redirect-text {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-family: "Pixelify Sans", monospace;
+      font-size: 16px;
+      color: #006644;
+      opacity: 0.8;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    
+    .redirect-text.show {
+      opacity: 1;
+    }
+    
+    /* Fade in animation for welcome text */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .welcome-text.show {
+      opacity: 1;
+      animation: fadeIn 1s ease-out forwards;
+    }
+    
+    .welcome-line {
+      font-size: 36px;
+      margin-bottom: 5px;
+      color: #006644;
+      opacity: 0;
+      animation: fadeIn 0.8s ease-out 0.5s forwards; /* Delay for welcome line */
+    }
+  
+    .name-line {
+      font-size: 40px;
+      color: #006644;
+      opacity: 0;
+      animation: fadeIn 0.8s ease-out 0.5s forwards; /* Delay for name line */
+    }
+
+    .name{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) translateY(60px);
+      width: 70%;
+      height: 10%;
+      background-color: #C5E1FF;
+      border-radius: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border: none;
+      font-size: 16px;
+      color: #006BB1;
+      transition: all 0.3s ease, transform 2s ease, width 2s ease, height 2s ease, background-color 2s ease;
+      opacity: 1;
+      z-index: 3;
+      box-sizing: border-box;
+    }
+    
+    .name::placeholder {
+      color: #006BB1;
+      opacity: 0.7;
+    }
+    
+    .user-submit{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) translateY(120px);
+      width: 70%;
+      height: 10%;
+      background-color: #006BB1;
+      color: white;
+      border-radius: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 2s cubic-bezier(0.42, 0, 0.58, 1), opacity 1s ease;
+      opacity: 1;
+      z-index: 3;
+      box-sizing: border-box;
+    }
+    
+    /* Second page elements */
+    .rectangle {
+      position: absolute;
+      top: 48%;
+      left: 2%;
+      width: 96%;
+      height: 49%;
+      border-radius: 30px;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 2s cubic-bezier(0.42, 0, 0.58, 1);
+      z-index: 2;
+      pointer-events: none;
+    }
+    
+    .rectangle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    
+    /* Animation states - BORDER WILL DISAPPEAR HERE */
+    .morphing {
+      /* Container morph */
+      .welcome-container {
+        background-color: #049C94;
+        border: 3.5px solid #000000;
+        border-radius: 30px;
+      }
+      
+      /* Blue rectangle morphs into green rectangle - BORDER REMOVED */
+      .welcome-gif {
+        background-color: #C7FFDA !important;
+        transform: translate(-50%, -50%) translateY(-85px);
+        width: 80% !important;
+        height: 45% !important;
+        opacity: 1 !important;
+        border: none !important; /* BORDER DISAPPEARS */
+      }
+      
+      /* Hide input and button with fade out */
+      .name, .user-submit {
+        opacity: 0;
+        transform: translate(-50%, -50%) translateY(20px);
+        pointer-events: none;
+      }
+      
+      /* Show BMO rectangle with fade in */
+      .rectangle {
+        opacity: 1;
+      }
+      
+      /* Change background */
+      body::before {
+        background-image: url("pictures/1.jpeg");
+        opacity: 0.7;
+      }
+    }
+    
+    /* Shake animation */
+    @keyframes shake {
+      0%, 100% { 
+        transform: translate(-50%, -50%) translateY(60px) translateX(0); 
+      }
+      10%, 30%, 50%, 70%, 90% { 
+        transform: translate(-50%, -50%) translateY(60px) translateX(-5px); 
+      }
+      20%, 40%, 60%, 80% { 
+        transform: translate(-50%, -50%) translateY(60px) translateX(5px); 
+      }
+    }
+    
+    .shake {
+      animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes screenVibrate {
+      0%, 100% { 
+        transform: translate(0, 0); 
+      }
+      10% { 
+        transform: translate(-2px, -2px); 
+      }
+      20% { 
+        transform: translate(2px, 2px); 
+      }
+      30% { 
+        transform: translate(-2px, 2px); 
+      }
+      40% { 
+        transform: translate(2px, -2px); 
+      }
+      50% { 
+        transform: translate(-1px, -1px); 
+      }
+      60% { 
+        transform: translate(1px, 1px); 
+      }
+      70% { 
+        transform: translate(-1px, 1px); 
+      }
+      80% { 
+        transform: translate(1px, -1px); 
+      }
+    }
+    
+    .screen-vibrate {
+      animation: screenVibrate 0.4s ease-in-out;
+    }
+    
+    @keyframes buttonShake {
+      0%, 100% { 
+        transform: translate(-50%, -50%) translateY(120px) translateX(0); 
+      }
+      10%, 30%, 50%, 70%, 90% { 
+        transform: translate(-50%, -50%) translateY(120px) translateX(-3px); 
+      }
+      20%, 40%, 60%, 80% { 
+        transform: translate(-50%, -50%) translateY(120px) translateX(3px); 
+      }
+    }
+    
+    .button-shake {
+      animation: buttonShake 0.5s ease-in-out;
+    }
+    
+    .welcome-container * {
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="welcome-container">
+    <div class="welcome-gif" id="welcomeGif">
+      <img src="https://media1.tenor.com/m/GkA9pLiwphQAAAAd/poby-dancing.gif" class="login-gif" id="loginGif">
+    </div>
+    <div class="rectangle">
+      <img src="pictures/3.png" alt="BMO Image">
+    </div>
+    
+    <input type="text" class="name" placeholder="name?" id="nameInput">
+    <button class="user-submit" id="submitButton">Submit</button>
+  </div>
+  
+  <script>
+    const validPasswords = ["erica", "jane", "pinkbberi", "lvreari", "leaveri.p","archiveri.s","leaveri.p","mangograhamlover","deathsync", "eri"
+    ];
+
+    let userName = "";
+    const bmoFrames = [
+      "bmo-face/bmo1.png",
+      "bmo-face/bmo2.png",
+      "bmo-face/bmo3.png",
+      "bmo-face/bmo4.png",
+      "bmo-face/bmo5.png",
+      "bmo-face/bmo6.png"
+    ];
+    const nameInput = document.getElementById('nameInput');
+    const submitButton = document.getElementById('submitButton');
+    const welcomeContainer = document.querySelector('.welcome-container');
+    const bodyElement = document.querySelector('body');
+    const welcomeGif = document.getElementById('welcomeGif');
+    const loginGif = document.getElementById('loginGif');
+
+    submitButton.addEventListener('click', function() {
+      nameInput.blur();
+      checkPassword();
+    });
+
+    nameInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        this.blur();
+        checkPassword();
+      }
+    });
+
+    function checkPassword() {
+      const inputValue = nameInput.value.trim();
+
+      userName = inputValue;
+      
+      if (!inputValue) {
+        nameInput.classList.add('shake');
+        submitButton.classList.add('button-shake');
+        bodyElement.classList.add('screen-vibrate');
+        
+        setTimeout(() => {
+          nameInput.classList.remove('shake');
+          submitButton.classList.remove('button-shake');
+          bodyElement.classList.remove('screen-vibrate');
+        }, 500);
+        
+        return;
+      }
+      
+      const lowercaseInput = inputValue.toLowerCase();
+      let isMatch = false;
+      
+      for (const password of validPasswords) {
+        if (lowercaseInput.includes(password.toLowerCase())) {
+          isMatch = true;
+          break;
+        }
+      }
+      
+      if (isMatch) {
+        startMorphAnimation();
+      } else {
+        nameInput.classList.add('shake');
+        submitButton.classList.add('button-shake');
+        bodyElement.classList.add('screen-vibrate');
+        
+        setTimeout(() => {
+          nameInput.classList.remove('shake');
+          submitButton.classList.remove('button-shake');
+          bodyElement.classList.remove('screen-vibrate');
+        }, 500);
+        
+        setTimeout(() => {
+          nameInput.value = '';
+          userName = "";
+        }, 300);
+      }
+    }
+
+    function startMorphAnimation() {
+      if (loginGif) {
+        loginGif.style.opacity = '0';
+        setTimeout(() => {
+          if (loginGif.parentNode === welcomeGif) {
+            welcomeGif.removeChild(loginGif);
+          }
+        }, 300);
+      }
+      document.body.classList.add('morphing');
+      welcomeContainer.classList.add('morphing');
+      setTimeout(() => {
+        console.log("Morph complete! Starting BMO animation...");
+        startBMOAnimation();
+      }, 2200);
+    }
+    function startBMOAnimation() {
+      let frameIndex = 0;
+      const totalFrames = 7; 
+      const frameDuration = 250;
+      welcomeGif.innerHTML = '';
+      
+      function showFrame(index) {
+        if (index >= totalFrames) {
+          showWelcomeText();
+          return;
+        }
+        
+        if (index < bmoFrames.length) {
+          const img = document.createElement('img');
+          img.src = bmoFrames[index];
+          img.className = 'bmo-animation-img';
+          welcomeGif.innerHTML = '';
+          welcomeGif.appendChild(img);
+          
+          console.log(`Showing frame ${index + 1}: ${bmoFrames[index]}`);
+        } else {
+          welcomeGif.innerHTML = '';
+          welcomeGif.style.backgroundColor = '#C7FFDA';
+          console.log(`Frame ${index + 1}: Blank canvas`);
+        }
+        frameIndex++;
+        setTimeout(() => showFrame(frameIndex), frameDuration);
+      }
+      showFrame(frameIndex);
+    }
+    function showWelcomeText() {
+      welcomeGif.innerHTML = '';
+      const textDiv = document.createElement('div');
+      textDiv.className = 'welcome-text';
+      const displayName = userName || "User";
+      const welcomeLine = document.createElement('div');
+      welcomeLine.className = 'welcome-line';
+      welcomeLine.textContent = 'welcome,';
+      
+      const nameLine = document.createElement('div');
+      nameLine.className = 'name-line';
+      nameLine.textContent = displayName.toLowerCase() + '!';
+
+      if (displayName.length > 15) {
+        nameLine.style.fontSize = '32px';
+        welcomeLine.style.fontSize = '28px';
+      } else if (displayName.length > 10) {
+        nameLine.style.fontSize = '36px';
+        welcomeLine.style.fontSize = '32px';
+      }
+  
+      textDiv.appendChild(welcomeLine);
+      textDiv.appendChild(nameLine);
+ 
+      welcomeGif.appendChild(textDiv);
+      setTimeout(() => {
+        textDiv.classList.add('show');
+        showRedirectCountdown();
+      }, 100);
+      
+      console.log(`Showing welcome message for: ${displayName}`);
+    }
+    function showRedirectCountdown() {
+      let countdown = 3;
+      const redirectDiv = document.createElement('div');
+      redirectDiv.className = 'redirect-text';
+      redirectDiv.id = 'redirectText';
+      redirectDiv.innerHTML = `<span id="countdown">${countdown}</span>`;
+      welcomeGif.appendChild(redirectDiv);
+      setTimeout(() => {
+        redirectDiv.classList.add('show');
+      }, 500);
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        const countdownElement = document.getElementById('countdown');
+        if (countdownElement) {
+          countdownElement.textContent = countdown;
+        }
+        
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          redirectToNextPage();
+        }
+      }, 1000);
+
+      redirectDiv.addEventListener('click', redirectToNextPage);
+      welcomeGif.addEventListener('click', redirectToNextPage);
+    }
+
+    function redirectToNextPage() {
+      const nextPageUrl = "page2.html"; 
+   
+      if (userName) {
+        window.location.href = `${nextPageUrl}?username=${encodeURIComponent(userName)}`;
+        
+      } else {
+        window.location.href = nextPageUrl;
+      }
+    }
+
+    document.addEventListener('touchstart', function(e) {
+      if (e.touches.length > 1) e.preventDefault();
+    }, false);
+    
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('touchstart', function(e) {
+      if (e.target !== nameInput && e.target !== submitButton) {
+        nameInput.blur();
+      }
+    });
+  </script>
+</body>
+</html>
